@@ -7,6 +7,7 @@ function App() {
   // UseState hooks to manage USDC / COMP values
   const [usdcAmount, setUsdcAmount] = useState("");
   const [compAmount, setCompAmount] = useState("0");
+  const [compAmountV3, setCompAmountV3] = useState("0");
 
   useEffect(() => {
     if (usdcAmount !== "") {
@@ -17,17 +18,16 @@ function App() {
   // Fetches and sets the value of output currency to compAmount
   async function work() {
     const outAmount = getAmountOut(usdcAmount);
-    console.log(outAmount);
     setCompAmount(await outAmount);
-    console.log("V3:");
-    console.log(getAmountOutV3());
+    const outAmountV3 = getAmountOutV3(usdcAmount);
+    setCompAmountV3(await outAmountV3);
   }
 
   return (
     <div className="App">
       <input value={usdcAmount} onChange={(event) => {setUsdcAmount(event.target.value)}}></input>
-      {compAmount}
-      <>{}</>
+      <div>{compAmount}</div>
+      <div>{compAmountV3}</div>
     </div>
   );
 }
