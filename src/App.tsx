@@ -25,9 +25,9 @@ function App() {
 
   return (
     <div className="App">
-      <input value={usdcAmount} onChange={(event) => {setUsdcAmount(event.target.value)}}></input>
-      <div>{compAmount}</div>
-      <div>{compAmountV3}</div>
+      <input value={usdcAmount} onChange={(event) => {setUsdcAmount(event.target.value)}} placeholder={"USDC"}></input>
+      <div>Compound Amount: {compAmount} using UniV2</div>
+      <div>Compound Amount: {compAmountV3} using UniV3</div>
     </div>
   );
 }
