@@ -11,8 +11,8 @@ import { useCallback } from "react";
 
 export const provider = new ethers.providers.InfuraProvider('mainnet', process.env.INFURA_KEY);
 
-//const USDC = new Token(ChainId.MAINNET, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', 6);
-//const COMP = new Token(ChainId.MAINNET, '0xc00e94cb662c3520282e6f5717214004a7f26888', 18);
+const USDC = new Token(1, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', 6);
+const COMP = new Token(1, '0xc00e94cb662c3520282e6f5717214004a7f26888', 18);
 
 interface SwapOptions {
   slippageTolerance: Percent
@@ -25,19 +25,16 @@ export function useUniSwapRouter(
   trade: Trade<Currency, Currency, TradeType> | undefined,
   options: SwapOptions,
 ) {
-  return useCallback(async (): Promise<TransactionResponse> => {
-    const { calldata: data, value } = SwapRouter.swapERC20CallParameters(trade, {
-      slippageTolerance: options.slippageTolerance,
-      deadlineOrPreviousBlockhash: options.deadline?.toString(),
-      inputTokenPermit: options.permit,
-      fee: options.feeOptions,
-    });
-  }
+  // @ts-ignore
+  const { calldata: data, value } = SwapRouter.swapERC20CallParameters(trade, {
+    slippageTolerance: options.slippageTolerance,
+    deadlineOrPreviousBlockhash: options.deadline?.toString(),
+    inputTokenPermit: options.permit,
+    fee: options.feeOptions,
+  });
 }
 
 async function getAmountOut(inputAmount: BigNumber, options: SwapOptions): Promise<BigNumber> {
-  const USDC = new Token(ChainId.MAINNET, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', 6);
-  const COMP = new Token(ChainId.MAINNET, '0xc00e94cb662c3520282e6f5717214004a7f26888', 18);
   const trade = new Trade(
     new Route([new Pair(USDC, COMP)], USDC),
     CurrencyAmount.fromRawAmount(USDC, inputAmount),

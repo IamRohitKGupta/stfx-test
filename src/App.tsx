@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getAmountOut } from './UniV2';
 import './App.css';
+import { getAmountOutV3 } from './UniV3';
 
 function App() {
   // UseState hooks to manage USDC / COMP values
@@ -18,6 +19,8 @@ function App() {
     const outAmount = getAmountOut(usdcAmount);
     console.log(outAmount);
     setCompAmount(await outAmount);
+    console.log("V3:");
+    console.log(getAmountOutV3());
   }
 
   return (
