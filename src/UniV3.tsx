@@ -42,28 +42,59 @@ export async function getAmountOutV3(amount: string): Promise<string> {
     provider
   )
 
-  const poolConstants = await getPoolConstants()
+  const poolConstants = await getPoolConstants(USDC, COMP);
 
   const quotedAmountOut = await quoterContract.callStatic.quoteExactInputSingle(
     poolConstants.token0,
     poolConstants.token1,
     poolConstants.fee,
-    ethers.utils.parseUnits(amount, 6),
+    ethers.utils.parseUnits(amount, USDC.decimals),
+    0
+  )
+  const quoteOut = ethers.utils.formatUnits(quotedAmountOut, 18);
+
+  return quoteOut
+}
+
+export async function getAmountOutV3Smart(amount: string): Promise<string> {
+  const quoterContract = new ethers.Contract(
+    QUOTER_CONTRACT_ADDRESS,
+    Quoter.abi,
+    provider
+  )
+
+  const poolConstantsWeth = await getPoolConstants(USDC, WETH);
+  const poolConstantsWethComp = await getPoolConstants(WETH, COMP);
+
+  const quotedAmountOutWeth = await quoterContract.callStatic.quoteExactInputSingle(
+    poolConstantsWeth.token0,
+    poolConstantsWeth.token1,
+    poolConstantsWeth.fee,
+    ethers.utils.parseUnits(amount, USDC.decimals),
     0
   )
 
-  return ethers.utils.formatUnits(quotedAmountOut, 18)
+  const quotedAmountOutWethComp = await quoterContract.callStatic.quoteExactInputSingle(
+    poolConstantsWethComp.token1,
+    poolConstantsWethComp.token0,
+    poolConstantsWethComp.fee,
+    ethers.utils.parseUnits(ethers.utils.formatUnits(quotedAmountOutWeth, WETH.decimals), WETH.decimals),
+    0
+  )
+
+  const quoteOutSmart = ethers.utils.formatUnits(quotedAmountOutWethComp, COMP.decimals);
+  return quoteOutSmart
 }
 
-async function getPoolConstants(): Promise<{
+async function getPoolConstants(tA: Token, tB: Token): Promise<{
   token0: string
   token1: string
   fee: number
 }> {
   const currentPoolAddress = computePoolAddress({
     factoryAddress: POOL_FACTORY_CONTRACT_ADDRESS,
-    tokenA: USDC,
-    tokenB: COMP,
+    tokenA: tA,
+    tokenB: tB,
     fee: FeeAmount.MEDIUM,
   })
 
