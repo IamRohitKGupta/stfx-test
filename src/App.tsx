@@ -7,6 +7,28 @@ import { USDC, COMP } from './UniV3'
 import { Protocol } from '@uniswap/router-sdk';
 import { ChainId, AlphaRouter } from '@uniswap/smart-order-router';
 import { ethers } from 'ethers';
+import styled from 'styled-components/macro';
+
+const InputWrapper = styled.div`
+  display: flex;
+  margin: auto;
+`
+const InputPanel = styled.input`
+    display: block;
+    margin: auto;
+    padding: 1rem;
+    max-width: 320px;
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+    background: #ffffff60;
+    border-radius: 16px;
+    border: none;
+    &:focus {
+      border: none;
+      outline: none;
+      background: #ffffff80;
+    }
+`
 
 function App() {
   // UseState hooks to manage USDC / COMP values
@@ -45,11 +67,11 @@ function App() {
   // Fetches and sets the value of output currency to compAmount
   async function work() {
     const outAmount = await getAmountOut(usdcAmount);
-    setCompAmount(outAmount);
+    setCompAmount(outAmount.slice(0, 6));
     const outAmountV3 = await getAmountOutV3(usdcAmount);
-    setCompAmountV3(outAmountV3);
+    setCompAmountV3(outAmountV3.slice(0, 6));
     const outAmountV3Smart = await getAmountOutV3Smart(usdcAmount);
-    setCompAmountV3Smart(outAmountV3Smart);
+    setCompAmountV3Smart(outAmountV3Smart.slice(0, 6));
     setSmart("Loading")
     await getClientSideQuote(
       {
@@ -68,16 +90,23 @@ function App() {
       CLIENT_PARAMS
     ).then((result) => {
       console.log(result)
-      setSmart(result.data.routeString + "  $COMP out: " + result.data.quoteDecimals + "  Please check console.log for more data")
+      setSmart(result.data.routeString + "  $COMP out: " + result.data.quoteDecimals.slice(0, 6) + "  Please check console.log for more data")
     })
   }
 
   return (
     <div className="App">
-      <input value={usdcAmount} onChange={(event) => {setUsdcAmount(event.target.value)}} placeholder={"USDC"}></input>
-      <div>Compound Amount: {compAmount} using UniV2 Direct Pair</div>
-      <div>Compound Amount: {compAmountV3} using UniV3 Direct Pair</div>
-      <div>Compound Amount: {compAmountV3Smart} Smart Router USDC {'>'} WETH {'>'} COMP</div>
+      <InputWrapper>
+        <InputPanel 
+          value={usdcAmount} 
+          onChange={(event) => {setUsdcAmount(event.target.value)}} 
+          placeholder={"USDC Amount"} 
+        />
+      </InputWrapper>
+      <div>--Output amounts--</div>
+      <div>{compAmount} $COMP using UniV2 Direct Pair</div>
+      <div>{compAmountV3} $COMP using UniV3 Direct Pair</div>
+      <div>{compAmountV3Smart} $COMP using Smart Router USDC {'>'} WETH {'>'} COMP</div>
       <div>--Uniswap smart router--</div>
       <div>{smart}</div>
     </div>
