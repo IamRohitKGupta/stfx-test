@@ -25,18 +25,19 @@ const InputWrapper = styled.div`
 const InputPanel = styled.input`
     display: block;
     margin: auto;
-    font-size: large;
+    font-size: x-large;
+    font-weight: bold;
     padding: 1rem;
     max-width: 320px;
     margin-top: 0.2rem;
     margin-bottom: 0.2rem;
-    background: #ffffff60;
+    background: #ffffffa5;
     border-radius: 24px;
     border: none;
     &:focus {
       border: none;
       outline: none;
-      background: #ffffff80;
+      background: #ffffff90;
     }
 `
 
@@ -47,17 +48,19 @@ const OutputWrapper = styled.div`
 const OutputPanel = styled.input<{ isLoading: boolean }>`
     display: block;
     margin: auto;
-    font-size: large;
+    font-size: x-large;
+    color: black;
+    font-weight: bold;
     padding: 1rem;
     max-width: 320px;
     margin-top: 0.2rem;
     margin-bottom: 0.2rem;
-    background: #ffffff60;
+    background: #ffffffa5;
     border-radius: 24px;
     border: none;
-    background-image: ${({isLoading}) => (isLoading ? 'linear-gradient(to right, #FFFB7D 20%, #b4ff69c2 80%)' : 'none')};
+    background-image: ${({isLoading}) => (isLoading ? 'linear-gradient(to right, #ff6060e4 20%, #7adcffe4 80%)' : 'none')};
     background-repeat: no-repeat;
-    background-size: 800px 104px;
+    background-size: 999px 108px;
     animation-duration: 2s;
     -webkit-animation-duration: 5s;
     animation-fill-mode: forwards;
