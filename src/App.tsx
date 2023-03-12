@@ -9,6 +9,15 @@ import { ChainId, AlphaRouter } from '@uniswap/smart-order-router';
 import { ethers } from 'ethers';
 import styled from 'styled-components/macro';
 
+const SwapDiv = styled.div`
+  display: block;
+  margin: auto;
+  margin-top: 36px;
+  width: 90%;
+  max-width: 480px;
+  height: fit-content;
+`
+
 const InputWrapper = styled.div`
   display: flex;
   margin: auto;
@@ -16,17 +25,60 @@ const InputWrapper = styled.div`
 const InputPanel = styled.input`
     display: block;
     margin: auto;
+    font-size: large;
     padding: 1rem;
     max-width: 320px;
     margin-top: 0.2rem;
     margin-bottom: 0.2rem;
     background: #ffffff60;
-    border-radius: 16px;
+    border-radius: 24px;
     border: none;
     &:focus {
       border: none;
       outline: none;
       background: #ffffff80;
+    }
+`
+
+const OutputWrapper = styled.div`
+  display: flex;
+`
+
+const OutputPanel = styled.input<{ isLoading: boolean }>`
+    display: block;
+    margin: auto;
+    font-size: large;
+    padding: 1rem;
+    max-width: 320px;
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+    background: #ffffff60;
+    border-radius: 24px;
+    border: none;
+    background-image: ${({isLoading}) => (isLoading ? 'linear-gradient(to right, #FFFB7D 20%, #b4ff69c2 80%)' : 'none')};
+    background-repeat: no-repeat;
+    background-size: 800px 104px;
+    animation-duration: 2s;
+    -webkit-animation-duration: 5s;
+    animation-fill-mode: forwards;
+    -webkit-animation-fill-mode: forwards; 
+    animation-iteration-count: infinite;
+    -webkit-animation-iteration-count: infinite;
+    animation-name: shimmer;
+    -webkit-animation-name: shimmer;
+    animation-timing-function: linear;
+    -webkit-animation-timing-function: linear;
+
+    @keyframes shimmer {
+      0% {
+        background-position: -468px 0;
+      }
+      50% {
+        background-position: 0px 0; 
+      }
+      100% {
+        background-position: -468px 0;
+      }
     }
 `
 
@@ -37,6 +89,8 @@ function App() {
   const [compAmountV3, setCompAmountV3] = useState("0");
   const [compAmountV3Smart, setCompAmountV3Smart] = useState("0");
   const [smart, setSmart] = useState("");
+  const [smartAmount, setSmartAmount] = useState("");
+  const [loading, setLoading] = useState(false)
 
   const CLIENT_PARAMS = {
     protocols: [Protocol.V2, Protocol.V3, Protocol.MIXED],
@@ -62,10 +116,11 @@ function App() {
     if (usdcAmount !== "") {
       work();
     }
-  }, [usdcAmount])
+  }, [usdcAmount, setLoading])
 
   // Fetches and sets the value of output currency to compAmount
   async function work() {
+    setLoading(true)
     const outAmount = await getAmountOut(usdcAmount);
     setCompAmount(outAmount.slice(0, 6));
     const outAmountV3 = await getAmountOutV3(usdcAmount);
@@ -91,24 +146,39 @@ function App() {
     ).then((result) => {
       console.log(result)
       setSmart(result.data.routeString + "  $COMP out: " + result.data.quoteDecimals.slice(0, 6) + "  Please check console.log for more data")
+      setSmartAmount(result.data.quoteDecimals.slice(0, 6))
+      setLoading(false)
+    }).catch((error) => {
+      console.log(error)
+      setLoading(false)
     })
   }
 
   return (
     <div className="App">
-      <InputWrapper>
-        <InputPanel 
-          value={usdcAmount} 
-          onChange={(event) => {setUsdcAmount(event.target.value)}} 
-          placeholder={"USDC Amount"} 
-        />
-      </InputWrapper>
-      <div>--Output amounts--</div>
-      <div>{compAmount} $COMP using UniV2 Direct Pair</div>
-      <div>{compAmountV3} $COMP using UniV3 Direct Pair</div>
-      <div>{compAmountV3Smart} $COMP using Smart Router USDC {'>'} WETH {'>'} COMP</div>
-      <div>--Uniswap smart router--</div>
-      <div>{smart}</div>
+      <SwapDiv>
+        <InputWrapper>
+          <InputPanel 
+            value={usdcAmount} 
+            onChange={(event) => {setUsdcAmount(event.target.value)}} 
+            placeholder={"USDC Amount"} 
+          />
+        </InputWrapper>
+        <OutputWrapper>
+          <OutputPanel
+            isLoading={loading}
+            value={smartAmount}
+            disabled={true}
+            placeholder={"COMP Amount"}
+          />
+        </OutputWrapper>
+        <div>--Output amounts--</div>
+        <div>{compAmount} $COMP using UniV2 Direct Pair</div>
+        <div>{compAmountV3} $COMP using UniV3 Direct Pair</div>
+        <div>{compAmountV3Smart} $COMP using Smart Router USDC {'>'} WETH {'>'} COMP</div>
+        <div>--Uniswap smart router--</div>
+        <div>{smart}</div>
+      </SwapDiv>
     </div>
   );
 }
