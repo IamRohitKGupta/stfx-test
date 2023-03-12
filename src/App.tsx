@@ -31,13 +31,13 @@ const InputPanel = styled.input`
     max-width: 320px;
     margin-top: 0.2rem;
     margin-bottom: 0.2rem;
-    background: #ffffffa5;
+    background: #ffffff90;
     border-radius: 24px;
     border: none;
     &:focus {
       border: none;
       outline: none;
-      background: #ffffff90;
+      background: #ffffffdb;
     }
 `
 
@@ -46,6 +46,7 @@ const OutputWrapper = styled.div`
 `
 
 const OutputPanel = styled.input<{ isLoading: boolean }>`
+    caret-color: transparent;
     display: block;
     margin: auto;
     font-size: x-large;
@@ -55,7 +56,7 @@ const OutputPanel = styled.input<{ isLoading: boolean }>`
     max-width: 320px;
     margin-top: 0.2rem;
     margin-bottom: 0.2rem;
-    background: #ffffffa5;
+    background: #ffffff90;
     border-radius: 24px;
     border: none;
     background-image: ${({isLoading}) => (isLoading ? 'linear-gradient(to right, #ff6060e4 20%, #7adcffe4 80%)' : 'none')};
@@ -82,6 +83,11 @@ const OutputPanel = styled.input<{ isLoading: boolean }>`
       100% {
         background-position: -468px 0;
       }
+    }
+
+    &:focus {
+      border: none;
+      outline: none;
     }
 `
 
@@ -171,7 +177,7 @@ function App() {
           <OutputPanel
             isLoading={loading}
             value={smartAmount}
-            disabled={true}
+            onChange={(event) => {}}
             placeholder={"COMP Amount"}
           />
         </OutputWrapper>
