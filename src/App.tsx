@@ -8,6 +8,8 @@ import { Protocol } from '@uniswap/router-sdk';
 import { ChainId, AlphaRouter } from '@uniswap/smart-order-router';
 import { ethers } from 'ethers';
 import styled from 'styled-components/macro';
+import Loader from './Loader';
+import RouteDecode from './RouteDecode';
 
 const SwapDiv = styled.div`
   display: block;
@@ -100,6 +102,7 @@ function App() {
   const [smart, setSmart] = useState("");
   const [smartAmount, setSmartAmount] = useState("");
   const [loading, setLoading] = useState(false)
+  const [routeData, setRouteData] = useState(null as unknown)
 
   const CLIENT_PARAMS = {
     protocols: [Protocol.V2, Protocol.V3, Protocol.MIXED],
@@ -130,13 +133,8 @@ function App() {
   // Fetches and sets the value of output currency to compAmount
   async function work() {
     setLoading(true)
-    const outAmount = await getAmountOut(usdcAmount);
-    setCompAmount(outAmount.slice(0, 6));
-    const outAmountV3 = await getAmountOutV3(usdcAmount);
-    setCompAmountV3(outAmountV3.slice(0, 6));
-    const outAmountV3Smart = await getAmountOutV3Smart(usdcAmount);
-    setCompAmountV3Smart(outAmountV3Smart.slice(0, 6));
     setSmart("Loading")
+    setSmartAmount("")
     await getClientSideQuote(
       {
         tokenInAddress: USDC.address,
@@ -153,7 +151,8 @@ function App() {
       getRouter(1), 
       CLIENT_PARAMS
     ).then((result) => {
-      console.log(result)
+      console.log(result.data)
+      setRouteData(result.data)
       setSmart(result.data.routeString + "  $COMP out: " + result.data.quoteDecimals.slice(0, 6) + "  Please check console.log for more data")
       setSmartAmount(result.data.quoteDecimals.slice(0, 6))
       setLoading(false)
@@ -175,16 +174,16 @@ function App() {
         </InputWrapper>
         <OutputWrapper>
           <OutputPanel
-            isLoading={loading}
+            isLoading={false}
             value={smartAmount}
             onChange={(event) => {}}
             placeholder={"COMP Amount"}
           />
         </OutputWrapper>
-        <div>--Output amounts--</div>
-        <div>{compAmount} $COMP using UniV2 Direct Pair</div>
-        <div>{compAmountV3} $COMP using UniV3 Direct Pair</div>
-        <div>{compAmountV3Smart} $COMP using Smart Router USDC {'>'} WETH {'>'} COMP</div>
+        <Loader loading={loading} />
+        { // @ts-ignore
+          routeData && !loading ? <RouteDecode data={routeData} /> : <></>
+        }
         <div>--Uniswap smart router--</div>
         <div>{smart}</div>
       </SwapDiv>
